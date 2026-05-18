@@ -1,0 +1,9 @@
+.git
+artifacts
+server.err.log
+server.out.log
+test.py
+node_modules
+npm-debug.log
+Dockerfile
+.dockerignore
