@@ -1,0 +1,612 @@
+:root {
+  color-scheme: light;
+  --bg: #f5f6f7;
+  --surface: #ffffff;
+  --surface-strong: #eef4f2;
+  --ink: #1b1f24;
+  --muted: #626d78;
+  --line: #d9dee3;
+  --teal: #0f766e;
+  --teal-dark: #0b5d57;
+  --coral: #d8543f;
+  --shadow: 0 18px 50px rgba(22, 29, 36, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    linear-gradient(90deg, rgba(15, 118, 110, 0.06) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(15, 118, 110, 0.05) 1px, transparent 1px),
+    var(--bg);
+  background-size: 44px 44px;
+  color: var(--ink);
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  min-height: 42px;
+  border: 0;
+  border-radius: 8px;
+  padding: 0 18px;
+  background: var(--teal);
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+button:hover {
+  background: var(--teal-dark);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.ghost-button {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.ghost-button:hover {
+  background: var(--surface-strong);
+}
+
+.app-shell {
+  width: min(1420px, calc(100vw - 32px));
+  min-height: calc(100vh - 32px);
+  margin: 16px auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  gap: 16px;
+}
+
+.watch-area,
+.side-panel {
+  min-width: 0;
+}
+
+.watch-area {
+  display: grid;
+  grid-template-rows: auto minmax(280px, 1fr) auto auto;
+  gap: 14px;
+}
+
+.topbar,
+.video-form,
+.anime-search,
+.debug-panel,
+.sync-strip,
+.room-box,
+.chat-box {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--shadow);
+}
+
+.topbar {
+  min-height: 86px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
+}
+
+.eyebrow {
+  margin: 0 0 4px;
+  color: var(--coral);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+h1,
+h2 {
+  margin: 0;
+  letter-spacing: 0;
+}
+
+h1 {
+  font-size: clamp(26px, 3.2vw, 42px);
+  line-height: 1.08;
+}
+
+h2 {
+  font-size: 18px;
+}
+
+.connection-pill {
+  flex: 0 0 auto;
+  min-width: 92px;
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: #f0f2f4;
+  color: var(--muted);
+  text-align: center;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.connection-pill.is-online {
+  background: #e3f5ee;
+  color: var(--teal-dark);
+}
+
+.connection-pill.is-error {
+  background: #ffe7e0;
+  color: #9d311f;
+}
+
+.video-shell {
+  position: relative;
+  min-height: 280px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #101418;
+  box-shadow: var(--shadow);
+}
+
+video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 280px;
+  aspect-ratio: 16 / 9;
+  background: #101418;
+}
+
+.empty-video {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 8px;
+  padding: 24px;
+  color: #f8fafc;
+  text-align: center;
+  background:
+    linear-gradient(135deg, rgba(15, 118, 110, 0.22), transparent 45%),
+    #101418;
+  pointer-events: none;
+}
+
+.empty-video strong {
+  font-size: 22px;
+}
+
+.empty-video span {
+  color: #cbd5df;
+}
+
+.empty-video.is-hidden {
+  display: none;
+}
+
+.video-form,
+.room-form,
+.chat-form,
+.room-share {
+  display: flex;
+  gap: 10px;
+}
+
+.video-form {
+  align-items: end;
+  padding: 14px;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.field-grow {
+  flex: 1 1 auto;
+}
+
+.field span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+input,
+select {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 12px;
+  background: #ffffff;
+  color: var(--ink);
+  outline: none;
+}
+
+input:focus,
+select:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.16);
+}
+
+select {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+    linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) 18px,
+    calc(100% - 12px) 18px;
+  background-size:
+    6px 6px,
+    6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 34px;
+}
+
+.anime-search {
+  display: grid;
+  gap: 14px;
+  padding: 14px;
+}
+
+.search-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.search-head h2 {
+  margin-bottom: 3px;
+}
+
+#sourceStatus {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.source-switch {
+  display: grid;
+  gap: 6px;
+  width: min(260px, 42vw);
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.anime-search-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+}
+
+.anime-results {
+  min-height: 172px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.episode-results {
+  display: none;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+
+.episode-results.is-visible {
+  display: grid;
+  gap: 10px;
+}
+
+.episode-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.episode-heading h3 {
+  margin: 0;
+  overflow: hidden;
+  font-size: 16px;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.episode-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  gap: 8px;
+}
+
+.episode-button {
+  min-height: 38px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  background: #ffffff;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.episode-button:hover {
+  background: var(--surface-strong);
+}
+
+.anime-card {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.anime-cover {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 2.8;
+  object-fit: cover;
+  background: #10201e;
+}
+
+.anime-card-body {
+  display: grid;
+  gap: 10px;
+  padding: 10px;
+}
+
+.anime-card h3 {
+  min-height: 42px;
+  margin: 0;
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+
+.anime-card button {
+  width: 100%;
+}
+
+.search-empty {
+  grid-column: 1 / -1;
+  min-height: 150px;
+  display: grid;
+  place-items: center;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  background: #fbfcfd;
+  color: var(--muted);
+  padding: 18px;
+  text-align: center;
+}
+
+.debug-panel {
+  padding: 14px;
+}
+
+.operation-log {
+  max-height: 340px;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #101418;
+  color: #d8f3ec;
+  padding: 10px;
+  font-family: "Cascadia Mono", Consolas, "SFMono-Regular", monospace;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.operation-entry {
+  margin: 0 0 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.operation-entry:last-child {
+  margin-bottom: 0;
+  border-bottom: 0;
+}
+
+.operation-entry strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #f8fafc;
+}
+
+.sync-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 48px;
+  padding: 12px 14px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.sync-strip span:first-child {
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.side-panel {
+  display: grid;
+  grid-template-rows: auto minmax(320px, 1fr);
+  gap: 16px;
+}
+
+.room-box,
+.chat-box {
+  padding: 14px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.room-form {
+  flex-direction: column;
+}
+
+.room-share {
+  margin-top: 12px;
+}
+
+.room-share input {
+  color: var(--muted);
+}
+
+.members {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.member {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: #fbfcfd;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--teal);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.chat-box {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+#memberCount {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.messages {
+  min-height: 260px;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfd;
+  padding: 10px;
+}
+
+.message {
+  margin-bottom: 10px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #edf0f2;
+}
+
+.message.is-system {
+  color: var(--muted);
+  background: var(--surface-strong);
+}
+
+.message-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.message-text {
+  overflow-wrap: anywhere;
+}
+
+.chat-form {
+  margin-top: 10px;
+}
+
+.chat-form input {
+  flex: 1 1 auto;
+}
+
+@media (max-width: 980px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+    width: min(100vw - 20px, 760px);
+    margin: 10px auto;
+  }
+
+  .side-panel {
+    grid-template-rows: auto auto;
+  }
+}
+
+@media (max-width: 620px) {
+  .topbar,
+  .video-form,
+  .search-head,
+  .sync-strip,
+  .room-share {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .topbar {
+    min-height: auto;
+  }
+
+  button {
+    width: 100%;
+  }
+
+  .sync-strip {
+    gap: 4px;
+  }
+
+  .source-switch {
+    width: 100%;
+  }
+
+  .anime-search-form {
+    grid-template-columns: 1fr;
+  }
+}

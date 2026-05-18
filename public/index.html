@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Towwatch 双人同步观影</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="watch-area" aria-label="同步观影">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Towwatch</p>
+            <h1>双人同步观影</h1>
+          </div>
+          <div class="connection-pill" id="connectionStatus">未连接</div>
+        </header>
+
+        <div class="video-shell">
+          <video id="video" controls playsinline preload="metadata"></video>
+          <div class="empty-video" id="emptyVideo">
+            <strong>搜索动漫，点播放后自动同步</strong>
+            <span>也可以粘贴浏览器可直接播放的视频 URL。</span>
+          </div>
+        </div>
+
+        <form class="video-form" id="videoForm">
+          <label class="field field-grow">
+            <span>视频 URL</span>
+            <input id="videoUrl" type="url" placeholder="https://example.com/movie.mp4" autocomplete="off" />
+          </label>
+          <button type="submit">载入视频</button>
+        </form>
+
+        <section class="anime-search" aria-label="搜索动漫">
+          <div class="search-head">
+            <div>
+              <h2>搜索动漫</h2>
+              <span id="sourceStatus">加载源中</span>
+            </div>
+            <label class="source-switch">
+              <span>源</span>
+              <select id="sourceSelect"></select>
+            </label>
+          </div>
+
+          <form class="anime-search-form" id="sourceSearchForm">
+            <input id="sourceKeyword" type="search" placeholder="搜索动漫名称" autocomplete="off" />
+            <button type="submit">搜索</button>
+          </form>
+
+          <div class="anime-results" id="searchResults"></div>
+          <div class="episode-results" id="episodeResults"></div>
+        </section>
+
+        <section class="debug-panel" aria-label="操作输出">
+          <div class="section-title">
+            <h2>操作输出</h2>
+            <button class="ghost-button" id="clearLogButton" type="button">清空</button>
+          </div>
+          <div class="operation-log" id="operationLog"></div>
+        </section>
+
+        <div class="sync-strip" aria-live="polite">
+          <span id="driftText">等待校准</span>
+          <span id="roomHint">创建或加入房间后开始同步。</span>
+        </div>
+      </section>
+
+      <aside class="side-panel" aria-label="房间与聊天">
+        <section class="room-box">
+          <div class="section-title">
+            <h2>房间</h2>
+            <button class="ghost-button" id="createRoomButton" type="button">创建</button>
+          </div>
+
+          <form class="room-form" id="roomForm">
+            <label class="field">
+              <span>昵称</span>
+              <input id="nameInput" type="text" maxlength="24" placeholder="你的名字" autocomplete="name" />
+            </label>
+            <label class="field">
+              <span>房间号</span>
+              <input id="roomInput" type="text" maxlength="32" placeholder="例如 A7K2Q9" autocomplete="off" />
+            </label>
+            <button type="submit">加入房间</button>
+          </form>
+
+          <div class="room-share">
+            <input id="shareLink" readonly placeholder="加入房间后生成邀请链接" />
+            <button class="ghost-button" id="copyLinkButton" type="button">复制</button>
+          </div>
+
+          <div class="members" id="members"></div>
+        </section>
+
+        <section class="chat-box">
+          <div class="section-title">
+            <h2>聊天</h2>
+            <span id="memberCount">0/2</span>
+          </div>
+          <div class="messages" id="messages" aria-live="polite"></div>
+          <form class="chat-form" id="chatForm">
+            <input id="chatInput" type="text" maxlength="500" placeholder="说点什么" autocomplete="off" />
+            <button type="submit">发送</button>
+          </form>
+        </section>
+      </aside>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
