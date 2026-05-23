@@ -69,7 +69,7 @@ async function runMigrations(pool) {
       image_url text,
       episode_url text,
       video_url text not null,
-      current_time double precision not null default 0,
+      position_seconds double precision not null default 0,
       duration double precision,
       is_playing boolean not null default false,
       created_at timestamptz not null default now(),
@@ -173,7 +173,7 @@ function rowToHistoryItem(row) {
     ? row.last_watched_at.getTime()
     : new Date(row.last_watched_at).getTime();
   const duration = Number(row.duration || 0);
-  let currentTime = clampSeconds(row.current_time);
+  let currentTime = clampSeconds(row.position_seconds);
 
   if (row.is_playing) {
     currentTime += Math.max(0, Date.now() - lastWatchedAt) / 1000;
@@ -249,7 +249,7 @@ async function loadWatchHistory(roomId, limit = 20) {
   const result = await pool.query(
     `
       select id, room_id, history_key, title, episode_name, source_name, image_url,
-        episode_url, video_url, current_time, duration, is_playing, last_watched_at
+        episode_url, video_url, position_seconds, duration, is_playing, last_watched_at
       from watch_history
       where room_id = $1
       order by last_watched_at desc
@@ -315,7 +315,7 @@ async function saveWatchHistory(roomId, state) {
     `
       insert into watch_history (
         id, room_id, history_key, title, episode_name, source_name, image_url,
-        episode_url, video_url, current_time, duration, is_playing, last_watched_at
+        episode_url, video_url, position_seconds, duration, is_playing, last_watched_at
       )
       values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, nullif($11, 0), $12, now())
       on conflict (room_id, history_key)
@@ -326,12 +326,12 @@ async function saveWatchHistory(roomId, state) {
         image_url = excluded.image_url,
         episode_url = excluded.episode_url,
         video_url = excluded.video_url,
-        current_time = excluded.current_time,
+        position_seconds = excluded.position_seconds,
         duration = coalesce(excluded.duration, watch_history.duration),
         is_playing = excluded.is_playing,
         last_watched_at = now()
       returning id, room_id, history_key, title, episode_name, source_name, image_url,
-        episode_url, video_url, current_time, duration, is_playing, last_watched_at
+        episode_url, video_url, position_seconds, duration, is_playing, last_watched_at
     `,
     [
       item.id,
