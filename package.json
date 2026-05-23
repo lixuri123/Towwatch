@@ -3,13 +3,25 @@
   "version": "0.1.0",
   "private": true,
   "description": "Lightweight two-person synchronized video watching app.",
-  "type": "commonjs",
   "scripts": {
-    "start": "node server.js",
-    "check": "node --check server.js",
+    "dev": "node next-server.js",
+    "build": "next build",
+    "start": "node next-server.js",
+    "check": "node --check server.js && node --check next-server.js && node --check src/server/realtime.js && node --check src/server/database.js && node --check scripts/migrate.js",
+    "db:migrate": "node scripts/migrate.js",
     "smoke": "node scripts/smoke-test.js"
   },
+  "dependencies": {
+    "@socket.io/redis-adapter": "^8.3.0",
+    "next": "^15.0.0",
+    "pg": "^8.13.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "redis": "^4.7.0",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1"
+  },
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   }
 }

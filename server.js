@@ -8,7 +8,14 @@ const PORT = Number(process.env.PORT || 3000);
 const PUBLIC_DIR = path.join(__dirname, "public");
 const MAX_MEMBERS = 2;
 const DEFAULT_SOURCE_URL = "https://raw.githubusercontent.com/MajoSissi/animeko-source/main/dist/online.json";
+const DEFAULT_SOURCE_FALLBACK_URLS = [
+  DEFAULT_SOURCE_URL,
+  "https://cdn.jsdelivr.net/gh/MajoSissi/animeko-source@main/dist/online.json",
+  "https://fastly.jsdelivr.net/gh/MajoSissi/animeko-source@main/dist/online.json",
+  "https://gcore.jsdelivr.net/gh/MajoSissi/animeko-source@main/dist/online.json"
+];
 const SOURCE_CACHE_MS = 10 * 60 * 1000;
+const FETCH_TIMEOUT_MS = Number(process.env.FETCH_TIMEOUT_MS || 60000);
 const MAC_PARSE_PLAYER_URL = "https://xn--z6uz08g.992588.xyz/player/";
 
 const MIME_TYPES = {
@@ -279,7 +286,7 @@ function uniqueMediaItems(items) {
 
 async function fetchText(url, headers = {}) {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 15000);
+  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
   try {
     const response = await fetch(url, {
@@ -295,9 +302,24 @@ async function fetchText(url, headers = {}) {
     }
 
     return await response.text();
+  } catch (error) {
+    if (error.name === "AbortError" || /aborted/i.test(error.message || "")) {
+      throw new Error(`请求超时（${Math.round(FETCH_TIMEOUT_MS / 1000)}s）：${url}`);
+    }
+    throw error;
   } finally {
     clearTimeout(timeout);
   }
+}
+
+function sourceFallbackUrls(sourceUrl) {
+  const normalizedUrl = sanitizeHttpUrl(sourceUrl) || DEFAULT_SOURCE_URL;
+  const configuredFallbacks = String(process.env.SOURCE_FALLBACK_URLS || "")
+    .split(",")
+    .map((url) => sanitizeHttpUrl(url))
+    .filter(Boolean);
+  const defaults = normalizedUrl === DEFAULT_SOURCE_URL ? DEFAULT_SOURCE_FALLBACK_URLS : [normalizedUrl];
+  return Array.from(new Set([normalizedUrl, ...configuredFallbacks, ...defaults]));
 }
 
 function normalizeSource(rawSource, index) {
@@ -333,27 +355,40 @@ function publicSource(source) {
 }
 
 async function loadSourceBundle(sourceUrl = DEFAULT_SOURCE_URL) {
-  const normalizedUrl = sanitizeHttpUrl(sourceUrl) || DEFAULT_SOURCE_URL;
-  const cached = sourceCache.get(normalizedUrl);
+  const candidates = sourceFallbackUrls(sourceUrl);
+  const cached = candidates
+    .map((url) => sourceCache.get(url))
+    .find((item) => item && Date.now() - item.loadedAt < SOURCE_CACHE_MS);
 
-  if (cached && Date.now() - cached.loadedAt < SOURCE_CACHE_MS) {
-    return cached.bundle;
+  if (cached) return cached.bundle;
+
+  const errors = [];
+  for (const candidateUrl of candidates) {
+    try {
+      const text = await fetchText(candidateUrl);
+      const data = JSON.parse(text);
+      const rawSources =
+        data.exportedMediaSourceDataList?.mediaSources ||
+        data.mediaSources ||
+        data.sources ||
+        [];
+
+      const sources = rawSources
+        .map((source, index) => normalizeSource(source, index))
+        .filter((source) => source.config && source.config.searchUrl);
+      const bundle = { sourceUrl: candidateUrl, sources };
+
+      for (const cacheKey of candidates) {
+        sourceCache.set(cacheKey, { loadedAt: Date.now(), bundle });
+      }
+
+      return bundle;
+    } catch (error) {
+      errors.push(`${candidateUrl}: ${error.message}`);
+    }
   }
 
-  const text = await fetchText(normalizedUrl);
-  const data = JSON.parse(text);
-  const rawSources =
-    data.exportedMediaSourceDataList?.mediaSources ||
-    data.mediaSources ||
-    data.sources ||
-    [];
-
-  const sources = rawSources
-    .map((source, index) => normalizeSource(source, index))
-    .filter((source) => source.config && source.config.searchUrl);
-  const bundle = { sourceUrl: normalizedUrl, sources };
-  sourceCache.set(normalizedUrl, { loadedAt: Date.now(), bundle });
-  return bundle;
+  throw new Error(`源列表加载失败，已尝试 ${candidates.length} 个地址。最后错误：${errors.at(-1) || "unknown"}`);
 }
 
 function findSource(bundle, sourceId) {
@@ -1369,9 +1404,17 @@ if (require.main === module) {
 
 module.exports = {
   DEFAULT_SOURCE_URL,
+  DEFAULT_SOURCE_FALLBACK_URLS,
   MAX_MEMBERS,
   Room,
+  fetchText,
+  findSource,
+  loadSourceBundle,
+  parseEpisodes,
+  publicSource,
+  resolveEpisodeVideo,
   rooms,
+  searchSource,
   server,
   start
 };

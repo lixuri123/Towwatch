@@ -1,0 +1,50 @@
+services:
+  app:
+    build: .
+    container_name: towwatch
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      REDIS_URL: redis://redis:6379
+      DATABASE_URL: postgres://towwatch:towwatch@postgres:5432/towwatch
+    command: sh -c "npm run db:migrate && npm start"
+    ports:
+      - "3000:3000"
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+
+  redis:
+    image: redis:7-alpine
+    container_name: towwatch-redis
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: towwatch-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: towwatch
+      POSTGRES_USER: towwatch
+      POSTGRES_PASSWORD: towwatch
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U towwatch -d towwatch"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  redis-data:
+  postgres-data:

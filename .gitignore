@@ -1,9 +1,7 @@
-.git
-artifacts
+node_modules
 .next
 .npm-cache
+.docker-config
 server.err.log
 server.out.log
-test.py
-node_modules
 npm-debug.log
